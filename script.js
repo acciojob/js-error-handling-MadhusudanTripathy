@@ -1,45 +1,48 @@
 //your code here
 class OutOfRangeError extends Error {
-    constructor(arg) {
-        super();
-        this.name = "OutOfRangeError";
-        this.message = `Expression should only consist of integers and +-/* characters and not <${arg}>`;
-    }
+  constructor(arg) {
+    super(`Expression should only consist of integers and +-/* characters and not ${arg}`);
+    this.name = "OutOfRangeError";
+  }
 }
 
 class InvalidExprError extends Error {
-    constructor() {
-        super();
-        this.name = "InvalidExprError";
-        this.message = "Expression should not have an invalid combination of expression";
-    }
+  constructor() {
+    super("Expression should not have an invalid combination of expression");
+    this.name = "InvalidExprError";
+  }
 }
 
-function evalString(expr) {
-    try {
-        // Check for invalid combinations of operators
-        if (/[+\-*/]{2,}/.test(expr)) {
-            throw new InvalidExprError();
-        }
-        // Check if expression starts with an invalid operator
-        if (expr[0] === "+" || expr[0] === "-" || expr[0] === "*" || expr[0] === "/") {
-            throw new SyntaxError("Expression should not start with invalid operator");
-        }
-        // Check if expression ends with an invalid operator
-        if (expr[expr.length - 1] === "+" || expr[expr.length - 1] === "-" || expr[expr.length - 1] === "*" || expr[expr.length - 1] === "/") {
-            throw new SyntaxError("Expression should not end with invalid operator");
-        }
-        // Check for any other non-integer, non-operator characters
-        if (!/^[\d+\-*/\s]+$/.test(expr)) {
-            throw new OutOfRangeError(expr);
-        }
-        // Evaluate the expression if all checks pass
-        return eval(expr);
-    } catch (err) {
-        if (err instanceof OutOfRangeError || err instanceof InvalidExprError) {
-            console.error(err.name + ": " + err.message);
-        } else {
-            console.error(err.message);
-        }
+
+function evalString(str) {
+  try {
+    if (/[\+\-\*\/]{2,}/.test(str)) {
+      throw new InvalidExprError();
     }
+    if (/^[\+\/\*]/.test(str)) {
+      throw new SyntaxError("Expression should not start with invalid operator");
+    }
+    if (/[\+\/\*\-]$/.test(str)) {
+      throw new SyntaxError("Expression should not end with invalid operator");
+    }
+    let result = eval(str);
+    if (!Number.isInteger(result)) {
+      throw new OutOfRangeError(result);
+    }
+    return result;
+  } catch (error) {
+    if (error instanceof OutOfRangeError || error instanceof InvalidExprError) {
+      console.error(`${error.name}: ${error.message}`);
+    } else {
+      throw error;
+    }
+  }
+}
+
+// example usage:
+console.log(evalString("1+2*3-4/2")); // expected output: 5
+console.log(evalString("1.5+2")); // expected output: OutOfRangeError
+console.log(evalString("1++2")); // expected output: InvalidExprError
+console.log(evalString("+1+2")); // expected output: SyntaxError
+console.log(evalString("1+2-")); // expected output: SyntaxError
 }
