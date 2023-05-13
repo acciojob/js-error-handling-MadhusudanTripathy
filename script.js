@@ -45,4 +45,3 @@ console.log(evalString("1.5+2")); // expected output: OutOfRangeError
 console.log(evalString("1++2")); // expected output: InvalidExprError
 console.log(evalString("+1+2")); // expected output: SyntaxError
 console.log(evalString("1+2-")); // expected output: SyntaxError
-}
